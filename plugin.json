@@ -1,0 +1,12 @@
+{
+  "name": "SevesoShield",
+  "version": "0.1.0",
+  "description": "Plugin d'aide à l'analyse rapide d'un incident industriel (géocodage, météo, SEVESO, contexte).",
+  "author": "Equipe SevesoShield",
+  "skills": [
+    {
+      "id": "geocoder-lieu",
+      "path": "./skills/geocoder-lieu/SKILL.md"
+    }
+  ]
+}
