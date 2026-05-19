@@ -48,7 +48,8 @@ def get_sensitive_facilities(lat: float, lon: float, radius: int):
     """
     
     try:
-        response = requests.post(overpass_url, data={'data': overpass_query}, timeout=30)
+        headers = {"User-Agent": "SevesoShield/1.0 (Student Project)"}
+        response = requests.post(overpass_url, data={'data': overpass_query}, headers=headers, timeout=30)
         response.raise_for_status()
         data = response.json()
     except requests.exceptions.RequestException as e:

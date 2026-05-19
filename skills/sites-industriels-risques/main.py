@@ -21,7 +21,8 @@ def get_insee_code(city: str):
     """Récupère le code INSEE et les coordonnées d'une commune via l'API geo.api.gouv.fr"""
     url = "https://geo.api.gouv.fr/communes"
     try:
-        response = requests.get(url, params={"nom": city, "boost": "population", "limit": 1}, timeout=10)
+        params = {"nom": city, "fields": "centre", "boost": "population", "limit": 1}
+        response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         data = response.json()
         if data:
