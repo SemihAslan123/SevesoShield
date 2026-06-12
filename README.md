@@ -133,15 +133,15 @@ claude plugin install .
 
 ### Interface en langage naturel avec LLM — `ask.py` ⭐ Recommandé
 
-La version 2.0 utilise **Gemini Flash 2.0** comme cerveau pour analyser votre question, extraire les paramètres, orchestrer le pipeline et formuler la réponse.
+La version 2.0 utilise **Llama 3 (via Groq)** comme cerveau pour analyser votre question, extraire les paramètres, orchestrer le pipeline et formuler la réponse.
 
 **Prérequis pour `ask.py` :**
-Vous devez définir une clé API Gemini (100% gratuite, pas de CB requise) :
-1. Obtenez une clé sur [Google AI Studio](https://aistudio.google.com/apikey)
+Vous devez définir une clé API Groq (100% gratuite, ultra-rapide, aucune CB requise) :
+1. Obtenez une clé sur [Console Groq](https://console.groq.com/keys)
 2. Définissez-la dans votre terminal :
-   - Windows PowerShell : `$env:GEMINI_API_KEY = 'votre_cle'`
-   - Windows CMD : `set GEMINI_API_KEY=votre_cle`
-   - Linux/Mac : `export GEMINI_API_KEY='votre_cle'`
+   - Windows PowerShell : `$env:GROQ_API_KEY = 'votre_cle'`
+   - Windows CMD : `set GROQ_API_KEY=votre_cle`
+   - Linux/Mac : `export GROQ_API_KEY='votre_cle'`
 
 Posez ensuite une question directement en français :
 
@@ -154,9 +154,9 @@ python ask.py "Quels sont les risques autour de Tavaux ?"
 ```
 
 **Ce que le système fait automatiquement :**
-1. **Gemini** analyse la question, extrait le lieu ("autour de Rouen" → "Rouen") et l'intention.
+1. **Llama 3** analyse la question, extrait le lieu ("autour de Rouen" → "Rouen") et l'intention.
 2. Le **Pipeline multi-agents** est lancé et collecte les données en parallèle (~5 secondes).
-3. **Gemini** rédige une réponse fluide et directement adaptée à votre question initiale.
+3. **Llama 3** rédige une réponse fluide et directement adaptée à votre question initiale.
 
 ---
 

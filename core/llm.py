@@ -1,17 +1,17 @@
 """
-SevesoShield — Client LLM (Google Gemini Flash)
+SevesoShield — Client LLM (Groq / Llama 3)
 
 Rôle : Fournir le "cerveau" du pipeline.
-       Gemini Flash interprète la question en langage naturel
+       Llama 3 interprète la question en langage naturel
        et formule une réponse conversationnelle finale.
 
-Modèle : gemini-2.0-flash (gratuit — 1500 req/jour, 1M tokens/jour)
-API Key : https://aistudio.google.com/apikey (gratuit, sans carte bancaire)
+Modèle : llama3-8b-8192 (ou llama3-70b-8192) via Groq API (très rapide)
+API Key : https://console.groq.com/keys (gratuit, pas de carte bancaire requise)
 """
 
 import os
 import json
-from google import genai
+from groq import Groq
 
 
 # ──────────────────────────────────────────────
@@ -20,33 +20,33 @@ from google import genai
 
 def _get_api_key() -> str:
     """
-    Lit la clé API Gemini depuis la variable d'environnement GEMINI_API_KEY.
+    Lit la clé API Groq depuis la variable d'environnement GROQ_API_KEY.
     Lève une erreur claire si elle est absente.
     """
-    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    key = os.environ.get("GROQ_API_KEY", "").strip()
     if not key:
         raise EnvironmentError(
-            "\n\n❌ Variable d'environnement GEMINI_API_KEY manquante.\n"
+            "\n\n❌ Variable d'environnement GROQ_API_KEY manquante.\n"
             "\n"
-            "   1. Obtenez une clé gratuite sur : https://aistudio.google.com/apikey\n"
+            "   1. Obtenez une clé gratuite sur : https://console.groq.com/keys\n"
             "   2. Définissez-la dans votre terminal :\n"
             "\n"
             "      Windows PowerShell :\n"
-            "        $env:GEMINI_API_KEY = 'votre_cle_ici'\n"
+            "        $env:GROQ_API_KEY = 'votre_cle_ici'\n"
             "\n"
             "      Windows CMD :\n"
-            "        set GEMINI_API_KEY=votre_cle_ici\n"
+            "        set GROQ_API_KEY=votre_cle_ici\n"
             "\n"
             "      Linux / macOS :\n"
-            "        export GEMINI_API_KEY='votre_cle_ici'\n"
+            "        export GROQ_API_KEY='votre_cle_ici'\n"
         )
     return key
 
 
 def _build_client():
-    """Initialise et retourne le client Gemini."""
+    """Initialise et retourne le client Groq."""
     api_key = _get_api_key()
-    return genai.Client(api_key=api_key)
+    return Groq(api_key=api_key)
 
 
 # Singleton — initialisé une seule fois à l'import
@@ -101,16 +101,21 @@ Règles :
 - Ne retourne QUE le JSON, rien d'autre"""
 
     try:
-        response = model.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
+        response = model.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {"role": "system", "content": "Tu es un assistant JSON strict. Ne renvoie QUE du JSON valide."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0
         )
-        raw = response.text.strip()
-        # Nettoyer si Gemini ajoute des balises markdown
+        raw = response.choices[0].message.content.strip()
+        # Nettoyer si le LLM ajoute des balises markdown
         raw = raw.replace("```json", "").replace("```", "").strip()
         return json.loads(raw)
     except Exception as e:
-        # Fallback si Gemini échoue
+        print(f"  [Erreur LLM] {e}")
+        # Fallback si l'API échoue
         return {
             "city": None,
             "lat": None,
@@ -156,10 +161,14 @@ CONSIGNES DE RÉPONSE :
 """
 
     try:
-        response = model.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
+        response = model.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {"role": "system", "content": "Tu es SevesoShield, un assistant expert en risques industriels français."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3
         )
-        return response.text.strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         return f"❌ Erreur LLM lors de la génération de la réponse : {e}"

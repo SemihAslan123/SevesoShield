@@ -1,7 +1,7 @@
 """
 SevesoShield v2.0 — Interface LLM en langage naturel
 
-Gemini Flash joue le rôle de "cerveau" :
+Llama 3 (via Groq) joue le rôle de "cerveau" :
   1. Comprend la question en français (n'importe quelle formulation)
   2. Extrait le lieu et les paramètres pertinents
   3. Lance le pipeline multi-agents (déterministe)
@@ -14,8 +14,8 @@ Usage :
     python ask.py "Qu'est-ce qui peut exploser autour de Feyzin ?"
 
 Prérequis :
-    $env:GEMINI_API_KEY = "votre_cle_ici"
-    (clé gratuite sur https://aistudio.google.com/apikey)
+    $env:GROQ_API_KEY = "votre_cle_ici"
+    (clé gratuite sur https://console.groq.com/keys)
 """
 
 import sys
@@ -129,8 +129,8 @@ def main():
     print(f"  Question : \"{question}\"")
     print()
 
-    # ── ÉTAPE 1 : Gemini comprend la question ──────────────────────────────────
-    print("  [LLM] Gemini analyse votre question...")
+    # ── ÉTAPE 1 : Le LLM comprend la question ──────────────────────────────────
+    print("  [LLM] Llama 3 analyse votre question...")
     try:
         parsed = llm.extract_location_from_question(question)
     except EnvironmentError as e:
@@ -145,7 +145,7 @@ def main():
 
     if not city and not (lat and lon):
         print()
-        print("  ❌ Gemini n'a pas identifié de lieu dans votre question.")
+        print("  ❌ Le LLM n'a pas identifié de lieu dans votre question.")
         print("  Essayez d'inclure un nom de commune (ex: 'autour de Rouen', 'à Lyon').")
         sys.exit(1)
 
@@ -166,10 +166,10 @@ def main():
         print("  ❌ Le pipeline n'a pas pu collecter les données nécessaires.")
         sys.exit(1)
 
-    # ── ÉTAPE 3 : Gemini formule la réponse ───────────────────────────────────
+    # ── ÉTAPE 3 : Le LLM formule la réponse ───────────────────────────────────
     logger.log_section("RÉPONSE DE SEVESOSCHIELD")
     print()
-    print("  [LLM] Gemini formule la réponse...")
+    print("  [LLM] Llama 3 formule la réponse...")
     print()
 
     pipeline_data = build_pipeline_summary(result)
