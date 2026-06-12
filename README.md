@@ -22,7 +22,7 @@ SevesoShield apporte des réponses indicatives à ces questions en s'appuyant ex
 
 ---
 
-## Deux modes d'utilisation
+## Trois modes d'utilisation
 
 ### Mode 1 — Plugin Claude Code (v1.0)
 Intégration dans Claude Code : Claude orchestre lui-même les skills via des commandes Bash.
@@ -30,7 +30,7 @@ Intégration dans Claude Code : Claude orchestre lui-même les skills via des co
 ### Mode 2 — Système Multi-Agents autonome (v2.0)
 Un système Python entièrement autonome avec un **agent manager** qui orchestre **5 agents spécialisés** en parallèle. Aucune intervention humaine requise — on pose une question en français, le système répond.
 
-### Mode 3 — Orchestration avancée avec LangGraph (v3.0) ✨ Nouveau
+### Mode 3 — Orchestration avancée avec LangGraph (v3.0) 
 Même logique que le v2.0, mais l'orchestration est gérée par un **StateGraph LangChain (LangGraph)**. Ce mode répond aux exigences d'ingénierie logicielle pour des workflows traçables et résilients, permettant de facilement forcer ou rejouer des étapes ("fake step 1").
 
 ---
