@@ -5,7 +5,7 @@ Rôle : Fournir le "cerveau" du pipeline.
        Llama 3 interprète la question en langage naturel
        et formule une réponse conversationnelle finale.
 
-Modèle : llama3-8b-8192 (ou llama3-70b-8192) via Groq API (très rapide)
+Modèle : llama-3.3-70b-versatile via Groq API (très rapide)
 API Key : https://console.groq.com/keys (gratuit, pas de carte bancaire requise)
 """
 
@@ -102,7 +102,7 @@ Règles :
 
     try:
         response = model.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "Tu es un assistant JSON strict. Ne renvoie QUE du JSON valide."},
                 {"role": "user", "content": prompt}
@@ -162,7 +162,7 @@ CONSIGNES DE RÉPONSE :
 
     try:
         response = model.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "Tu es SevesoShield, un assistant expert en risques industriels français."},
                 {"role": "user", "content": prompt}
