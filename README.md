@@ -1,8 +1,8 @@
 # SevesoShield
 
-> **Plugin Claude Code d'aide à l'analyse rapide d'un incident industriel**
+> **Plugin Claude Code + Système Multi-Agents d'aide à l'analyse rapide d'un incident industriel**
 
-SevesoShield est un plugin Claude Code destiné à assister une première analyse autour d'un incident industriel. Il permet de localiser un site, d'identifier son contexte ICPE/SEVESO, de récupérer les conditions météo locales, d'interpréter la direction du vent de manière indicative, de repérer les établissements sensibles à proximité et de produire une synthèse opérationnelle.
+SevesoShield est un outil d'assistance à la première analyse d'un incident industriel. Il permet de localiser un site, d'identifier son contexte ICPE/SEVESO, de récupérer les conditions météo locales, d'interpréter la direction du vent, de repérer les établissements sensibles à proximité et de produire une synthèse opérationnelle structurée.
 
 > ⚠️ **Avertissement important** : SevesoShield ne remplace pas les outils officiels de gestion de crise, les plans particuliers d'intervention (PPI), les procédures préfectorales, les services de secours, ni les modèles scientifiques de dispersion atmosphérique. Les résultats sont **indicatifs** et doivent être validés par des acteurs compétents.
 
@@ -10,7 +10,7 @@ SevesoShield est un plugin Claude Code destiné à assister une première analys
 
 ## Contexte
 
-En cas d'incident industriel, les premières minutes sont essentielles pour comprendre rapidement le territoire concerné. Une cellule de crise ou un opérateur peut avoir besoin de répondre rapidement à plusieurs questions :
+En cas d'incident industriel, les premières minutes sont essentielles. Une cellule de crise ou un opérateur peut avoir besoin de répondre rapidement à plusieurs questions :
 
 - Où se situe exactement le site industriel ?
 - Le site est-il classé ICPE ou SEVESO ?
@@ -18,11 +18,64 @@ En cas d'incident industriel, les premières minutes sont essentielles pour comp
 - Quelle est la météo locale et dans quelle direction souffle le vent ?
 - Quelle est la commune concernée et sa population ?
 
-SevesoShield apporte des réponses indicatives à ces questions en s'appuyant exclusivement sur des données ouvertes (Open Data) françaises.
+SevesoShield apporte des réponses indicatives à ces questions en s'appuyant exclusivement sur des **données ouvertes (Open Data) françaises**.
 
 ---
 
-## Liste des Skills
+## Deux modes d'utilisation
+
+### Mode 1 — Plugin Claude Code (v1.0)
+Intégration dans Claude Code : Claude orchestre lui-même les skills via des commandes Bash.
+
+### Mode 2 — Système Multi-Agents autonome (v2.0) ✨ Nouveau
+Un système Python entièrement autonome avec un **agent manager** qui orchestre **5 agents spécialisés** en parallèle. Aucune intervention humaine requise — on pose une question en français, le système répond.
+
+---
+
+## Architecture Multi-Agents (v2.0)
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    AGENT MANAGER                         │
+│           (agents/manager_agent.py)                      │
+│  1. Reçoit la question / le lieu                         │
+│  2. Lance GeocoderAgent (séquentiel)                     │
+│  3. Lance 4 agents en parallèle                          │
+│  4. Agrège les résultats → SyntheseAgent                 │
+└──────┬──────────────────────────────────────────────────┘
+       │
+       ▼ [ÉTAPE 1 — Séquentiel]
+┌─────────────────┐
+│  GeocoderAgent  │  → Coordonnées GPS depuis nom de commune
+│ geocoder-lieu   │    (api-adresse.data.gouv.fr)
+└────────┬────────┘
+         │ lat, lon
+         ▼ [ÉTAPE 2 — Parallèle simultané]
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│  MeteoAgent  │ │  SitesAgent  │ │  Etab.Agent  │ │  Pop.Agent   │
+│ meteo-vent   │ │ sites-indust │ │ etabliss.    │ │ contexte-pop │
+│ Open-Meteo   │ │ Géorisques   │ │ OSM/Overpass │ │ geo.api.gouv │
+└──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
+         │               │               │               │
+         └───────────────┴───────────────┴───────────────┘
+                                 │
+                                 ▼ [ÉTAPE 3]
+                      ┌──────────────────────┐
+                      │    SyntheseAgent     │
+                      │  Rapport Markdown    │
+                      │  en 7 sections       │
+                      └──────────────────────┘
+```
+
+### Fonctionnalités clés de l'architecture
+- **Parallélisme** : les 4 agents indépendants tournent simultanément → ~5 secondes de bout en bout
+- **Mode dégradé** : si une API est indisponible, le pipeline continue avec les données disponibles
+- **Contrats normalisés** : chaque agent reçoit un `AgentInput` et retourne un `AgentOutput` standardisé
+- **Journal horodaté** : chaque étape est loggée avec sa durée en millisecondes
+
+---
+
+## Liste des Skills (v1.0 — compatible Claude Code)
 
 Le plugin est composé de **6 skills Claude Code** indépendants et activables à la demande :
 
@@ -52,30 +105,126 @@ Toutes les sources sont gratuites, ouvertes, et ne nécessitent **aucune clé d'
 ## Installation
 
 ### Prérequis
-- Python 3.x
-- Claude Code (CLI)
+- Python 3.10 ou supérieur
+- `pip` disponible
+- (Optionnel) Claude Code CLI pour le mode plugin
 
 ### Étapes
 
-1. Cloner le dépôt :
-   ```bash
-   git clone https://github.com/SemihAslan123/SevesoShield.git
-   cd SevesoShield
-   ```
+**1. Cloner le dépôt :**
+```bash
+git clone https://github.com/SemihAslan123/SevesoShield.git
+cd SevesoShield
+```
 
-2. Installer les dépendances Python :
-   ```bash
-   pip install -r requirements.txt
-   ```
+**2. Installer les dépendances Python :**
+```bash
+pip install -r requirements.txt
+```
 
-3. Installer le plugin dans Claude Code :
-   ```bash
-   claude plugin install .
-   ```
+**3. (Optionnel) Installer le plugin dans Claude Code :**
+```bash
+claude plugin install .
+```
 
 ---
 
-## Tester les Scripts en Ligne de Commande
+## Utilisation — Mode Multi-Agents (v2.0)
+
+### Interface en langage naturel — `ask.py` ⭐ Recommandé
+
+Pose une question directement en français :
+
+```bash
+python ask.py "Je veux savoir ce qu'il y a autour de Rouen comme risques industriels"
+python ask.py "Y a-t-il des sites SEVESO près de Dunkerque ?"
+python ask.py "Combien d'écoles sont exposées autour de Feyzin ?"
+python ask.py "Analyse la situation industrielle à Fos-sur-Mer"
+python ask.py "Quels sont les risques autour de Tavaux ?"
+```
+
+**Ce que le système fait automatiquement :**
+1. Extrait le lieu de ta question (`"autour de Rouen"` → `"Rouen"`)
+2. Lance le pipeline multi-agents (~5 secondes)
+3. Répond directement à ta question avec des données réelles
+
+---
+
+### Interface CLI avancée — `main.py`
+
+Pour plus de contrôle sur les paramètres :
+
+```bash
+# Par nom de commune
+python main.py --city "Tavaux"
+python main.py --city "Feyzin" --radius 10000
+
+# Par coordonnées GPS directes (passe le géocodage)
+python main.py --lat 47.04 --lon 5.41
+
+# Sauvegarder le rapport complet en Markdown
+python main.py --city "Rouen" --output rapport_rouen.md
+
+# Sans couleurs (pour redirection dans un fichier)
+python main.py --city "Lyon" --no-color > rapport.txt
+
+# Aide complète
+python main.py --help
+```
+
+---
+
+### Exemple de sortie — `ask.py`
+
+```
+  Question : "Y a-t-il des sites SEVESO près de Dunkerque ?"
+
+  Lieu détecté : Dunkerque
+
+  [Pipeline Multi-Agents — 5.6 secondes]
+
+📍 Dunkerque (Nord) — 86 263 habitants
+   Région : Hauts-de-France
+
+🏭 Risques industriels dans un rayon de 5 km :
+   → 50 installations ICPE identifiées au total.
+   → ⛔ 6 site(s) SEVESO Seuil Haut (danger majeur) :
+      • DEPOTS DE PETROLE COTIERS — à 1051 m
+      • TEPSA ST Dunkerque — à 1354 m
+      • Société de la Raffinerie de Dunkerque — à 2021 m
+      ...
+
+🏫 Établissements sensibles (rayon 3 km) :
+   → 170 établissements au total.
+   → 🏫 85 établissement(s) scolaire(s) exposé(s).
+   → 🏥 1 hôpital(ux)/clinique(s) à proximité.
+
+🌬️ Conditions météo actuelles :
+   → 15.8°C, vent à 23.4 km/h depuis le Ouest-Sud-Ouest.
+   → Direction de vigilance indicative : vers le Est-Nord-Est.
+
+💬 En résumé :
+   Il y a 6 site(s) SEVESO Seuil Haut autour de Dunkerque.
+   85 école(s) sont dans le périmètre exposé.
+```
+
+---
+
+## Utilisation — Mode Claude Code (v1.0)
+
+```bash
+# Installer le plugin
+claude plugin install .
+
+# Puis dans Claude Code, poser une question :
+> "Analyse rapidement un incident industriel autour de la commune de Tavaux (Jura)."
+> "Y a-t-il des sites SEVESO dans un rayon de 5 km autour de Pierre-Bénite (69) ?"
+> "Quel est le contexte autour du point GPS 47.04, 5.41 ?"
+```
+
+---
+
+## Tester les Scripts en Ligne de Commande (Skills isolés)
 
 Chaque skill est testable indépendamment, sans Claude :
 
@@ -100,81 +249,58 @@ Tous les scripts renvoient du **JSON structuré** sur la sortie standard.
 
 ---
 
-## Démonstration avec Claude Code
-
-Une fois le plugin installé, lancez une session Claude Code et utilisez un de ces prompts :
-
-```
-> "Analyse rapidement un incident industriel autour de la commune de Tavaux (Jura). Fais-moi une synthèse complète pour une cellule de crise."
-```
-
-```
-> "Y a-t-il des sites SEVESO dans un rayon de 5 km autour de Pierre-Bénite (69) ?"
-```
-
-```
-> "Quel est le contexte autour du point GPS 47.04, 5.41 ? Donne-moi la météo, les établissements sensibles et les sites industriels à risque."
-```
-
-Claude va automatiquement chaîner les skills pertinents et produire une synthèse opérationnelle structurée.
-
----
-
 ## Structure du Dépôt
 
 ```
 SevesoShield/
 │
-├── README.md
+├── ask.py                          ← Interface langage naturel (v2.0) ⭐
+├── main.py                         ← CLI avancée multi-agents (v2.0)
 ├── requirements.txt
-├── plugin.json
-├── .gitignore
+├── plugin.json                     ← Déclaration plugin Claude Code
+├── CLAUDE.md                       ← Instructions pour Claude Code
+├── README.md
 │
-├── skills/
+├── agents/                         ← Agents spécialisés (v2.0)
+│   ├── __init__.py
+│   ├── base_agent.py               ← Classe abstraite commune
+│   ├── manager_agent.py            ← Orchestrateur central
+│   ├── geocoder_agent.py           ← Agent géocodage
+│   ├── meteo_agent.py              ← Agent météo et vent
+│   ├── sites_agent.py              ← Agent sites ICPE/SEVESO
+│   ├── etablissements_agent.py     ← Agent établissements sensibles
+│   ├── population_agent.py         ← Agent contexte population
+│   └── synthese_agent.py           ← Agent synthèse finale
+│
+├── core/                           ← Infrastructure partagée (v2.0)
+│   ├── __init__.py
+│   ├── schemas.py                  ← Contrats inter-agents (dataclasses)
+│   └── logger.py                   ← Journal horodaté coloré
+│
+├── skills/                         ← Skills Claude Code (v1.0 — inchangés)
 │   ├── geocoder-lieu/
 │   │   ├── SKILL.md
 │   │   ├── main.py
 │   │   └── references/
-│   │       ├── api.md
-│   │       └── exemples.md
-│   │
 │   ├── sites-industriels-risques/
 │   │   ├── SKILL.md
 │   │   ├── main.py
 │   │   └── references/
-│   │       ├── sources.md
-│   │       ├── limites.md
-│   │       └── exemples.md
-│   │
 │   ├── meteo-vent-local/
 │   │   ├── SKILL.md
 │   │   ├── main.py
 │   │   └── references/
-│   │       ├── api.md
-│   │       ├── interpretation-vent.md
-│   │       └── exemples.md
-│   │
 │   ├── etablissements-sensibles/
 │   │   ├── SKILL.md
 │   │   ├── main.py
 │   │   └── references/
-│   │       ├── tags-osm.md
-│   │       ├── requetes-overpass.md
-│   │       └── exemples.md
-│   │
 │   ├── contexte-population/
 │   │   ├── SKILL.md
 │   │   ├── main.py
 │   │   └── references/
-│   │       ├── sources.md
-│   │       └── exemples.md
-│   │
 │   └── synthese-incident-industriel/
 │       ├── SKILL.md
 │       └── references/
-│           ├── methode.md
-│           ├── limites.md
-│           └── exemple-synthese.md
 │
 └── docs/
     ├── architecture.md
@@ -192,7 +318,20 @@ SevesoShield/
 requests
 ```
 
-Voir `requirements.txt`. Aucune dépendance lourde ni framework requis.
+Voir `requirements.txt`. Aucune dépendance lourde ni framework requis.  
+Le parallélisme utilise `concurrent.futures.ThreadPoolExecutor` de la bibliothèque standard Python.
+
+---
+
+## Résultats de tests réels
+
+| Commune | Durée | Sites ICPE | SEVESO Seuil Haut | Établissements | Écoles |
+|---|---|---|---|---|---|
+| Tavaux (39) | 5.6 s | 37 | 2 (Syensqo, INOVYN) | 22 | 14 |
+| Feyzin (69) | 4.3 s | 50 | 6 | 58 | 34 |
+| Dunkerque (59) | 5.6 s | 50 | 6 | 170 | 85 |
+| Rouen (76) | 6.3 s | 50 | 0 | 388 | 149 |
+| Pierre-Bénite (69) | 9.3 s | 50 | 6 (ARKEMA, KEM ONE...) | 125 | 59 |
 
 ---
 
@@ -201,4 +340,5 @@ Voir `requirements.txt`. Aucune dépendance lourde ni framework requis.
 - Les données sont issues de sources ouvertes et peuvent ne pas être exhaustives ou à jour en temps réel.
 - L'interprétation de la direction du vent est une règle géométrique simple (`(direction + 180) % 360`). Elle ne tient compte ni du relief, ni de la stabilité atmosphérique, ni d'une dispersion en cône.
 - OpenStreetMap est une base collaborative : certains établissements peuvent être manquants selon le niveau de cartographie local.
+- L'API Overpass peut être temporairement indisponible (timeout) sur les zones très denses — le système bascule alors en mode dégradé.
 - Ce plugin est conçu pour un usage indicatif en phase de première analyse. Il ne remplace en aucun cas les outils réglementaires ou les plans d'urgence officiels (PPI, ORSEC).
