@@ -1,7 +1,7 @@
 ---
 name: contexte-population
 description: Trigger when user asks about population, commune concernée, contexte administratif, code INSEE, démographie.
-allowed-tools: Bash(python3 *)
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/main.py *)
 ---
 
 # Skill contexte-population

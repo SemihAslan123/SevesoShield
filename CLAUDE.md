@@ -91,20 +91,41 @@ python3 skills/contexte-population/main.py --lat LAT --lon LON
 
 **Sortie :** JSON avec ville, code INSEE, code postal, population, département, région.
 
+### 6. Hydrologie et Risques d'inondation (`hydrologie-vigicrues`)
+
+**Quand l'utiliser :** Quand l'utilisateur demande les risques d'inondation, crues, cours d'eau, Vigicrues.
+
+**Commande :**
+```bash
+python3 skills/hydrologie-vigicrues/main.py --lat LAT --lon LON
+```
+
+**Sortie :** JSON avec niveau de vigilance et tendance.
+**Action :** Informer l'utilisateur des risques d'inondation.
+
 ---
 
-### 6. Synthèse opérationnelle (`synthese-incident-industriel`)
+### 7. Visualisation des risques (`visualisation-risques`)
+
+**Quand l'utiliser :** Quand l'utilisateur demande une carte, un diagramme Mermaid, un mindmap ou une visualisation.
+
+**Action :** Vous devez générer vous-même un bloc de code `mermaid` (mindmap ou graph TD) résumant les sites SEVESO et établissements sensibles autour de la commune.
+
+---
+
+### 8. Synthèse opérationnelle (`synthese-incident-industriel`)
 
 **Quand l'utiliser :** Quand l'utilisateur demande une synthèse, une note de crise, un résumé opérationnel.
 
-**Action :** Exécuter les skills 1 à 5, puis structurer la réponse avec cette trame :
+**Action :** Exécuter les skills nécessaires, puis structurer la réponse avec cette trame :
 
 1. **Localisation** : commune, département, région, population.
 2. **Risques industriels** : sites SEVESO et ICPE identifiés, distance, statut.
-3. **Météo et vent** : conditions actuelles et direction de vigilance indicative.
+3. **Météo, vent et eau** : conditions actuelles, direction de vigilance, risques d'inondation.
 4. **Établissements sensibles** : synthèse par catégorie, les plus proches en priorité.
-5. **Points de vigilance** : 3 à 4 recommandations courtes et factuelles.
-6. **Avertissement obligatoire** : rappeler les limites du plugin.
+5. **Visualisation (Optionnel)** : proposer un diagramme mermaid.
+6. **Points de vigilance** : recommandations courtes et factuelles.
+7. **Avertissement obligatoire** : rappeler les limites du plugin.
 
 ---
 

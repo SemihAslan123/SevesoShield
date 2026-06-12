@@ -1,7 +1,7 @@
 ---
 name: synthese-incident-industriel
 description: Trigger when user asks for a synthèse, note de crise, résumé opérationnel, analyse globale, points de vigilance.
-allowed-tools: Bash(python3 *)
+allowed-tools: Read
 ---
 
 # Skill synthese-incident-industriel

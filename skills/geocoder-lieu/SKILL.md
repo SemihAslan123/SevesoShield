@@ -1,7 +1,7 @@
 ---
 name: geocoder-lieu
 description: Trigger when user asks to locate an address, a city, an industrial site, or get GPS coordinates (latitude, longitude) of a place.
-allowed-tools: Bash(python3 *)
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/main.py *)
 ---
 
 # Skill geocoder-lieu

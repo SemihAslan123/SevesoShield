@@ -27,8 +27,11 @@ SevesoShield apporte des réponses indicatives à ces questions en s'appuyant ex
 ### Mode 1 — Plugin Claude Code (v1.0)
 Intégration dans Claude Code : Claude orchestre lui-même les skills via des commandes Bash.
 
-### Mode 2 — Système Multi-Agents autonome (v2.0) ✨ Nouveau
+### Mode 2 — Système Multi-Agents autonome (v2.0)
 Un système Python entièrement autonome avec un **agent manager** qui orchestre **5 agents spécialisés** en parallèle. Aucune intervention humaine requise — on pose une question en français, le système répond.
+
+### Mode 3 — Orchestration avancée avec LangGraph (v3.0) ✨ Nouveau
+Même logique que le v2.0, mais l'orchestration est gérée par un **StateGraph LangChain (LangGraph)**. Ce mode répond aux exigences d'ingénierie logicielle pour des workflows traçables et résilients, permettant de facilement forcer ou rejouer des étapes ("fake step 1").
 
 ---
 
@@ -160,6 +163,20 @@ python ask.py "Quels sont les risques autour de Tavaux ?"
 
 ---
 
+### Alternative d'Excellence — Workflow LangGraph (`ask_langgraph.py`)
+
+Si vous avez besoin d'une architecture orientée "Workflow" (idéale pour prouver la robustesse de l'orchestration) :
+
+```bash
+python ask_langgraph.py "Analyse un incident à Tavaux"
+
+# Option spéciale : Court-circuiter l'étape 1 (simuler les données)
+python ask_langgraph.py --fake-step-1 --lat 47.04 --lon 5.41
+```
+Ce script utilise `langgraph` pour définir un graphe d'états (StateGraph) strict, incluant des routes conditionnelles et du parallélisme géré dynamiquement.
+
+---
+
 ### Interface CLI avancée — `main.py`
 
 Pour plus de contrôle sur les paramètres :
@@ -280,7 +297,8 @@ SevesoShield/
 │   ├── sites_agent.py              ← Agent sites ICPE/SEVESO
 │   ├── etablissements_agent.py     ← Agent établissements sensibles
 │   ├── population_agent.py         ← Agent contexte population
-│   └── synthese_agent.py           ← Agent synthèse finale
+│   ├── synthese_agent.py           ← Agent synthèse finale
+│   └── workflow_langgraph.py       ← Orchestrateur LangGraph (v3.0)
 │
 ├── core/                           ← Infrastructure partagée (v2.0)
 │   ├── __init__.py
@@ -308,6 +326,11 @@ SevesoShield/
 │   │   ├── SKILL.md
 │   │   ├── main.py
 │   │   └── references/
+│   ├── hydrologie-vigicrues/       ← Skill inondations
+│   │   ├── SKILL.md
+│   │   └── main.py
+│   ├── visualisation-risques/      ← Skill Mermaid
+│   │   └── SKILL.md
 │   └── synthese-incident-industriel/
 │       ├── SKILL.md
 │       └── references/

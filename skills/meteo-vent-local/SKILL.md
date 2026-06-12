@@ -1,7 +1,7 @@
 ---
 name: meteo-vent-local
 description: Trigger when user asks about météo locale, vent, direction du vent, rafales, panache, fumée, incident industriel, SEVESO, ICPE, vigilance sous le vent.
-allowed-tools: Bash(python3 *)
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/main.py *)
 ---
 
 # Skill meteo-vent-local

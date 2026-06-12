@@ -12,6 +12,9 @@ API Key : https://console.groq.com/keys (gratuit, pas de carte bancaire requise)
 import os
 import json
 from groq import Groq
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # ──────────────────────────────────────────────

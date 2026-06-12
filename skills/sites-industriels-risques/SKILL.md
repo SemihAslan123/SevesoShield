@@ -1,7 +1,7 @@
 ---
 name: sites-industriels-risques
 description: Trigger when user asks about sites industriels, risques, SEVESO, ICPE, usines proches, installations classées.
-allowed-tools: Bash(python3 *)
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/main.py *)
 ---
 
 # Skill sites-industriels-risques

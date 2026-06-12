@@ -1,7 +1,7 @@
 ---
 name: etablissements-sensibles
 description: Trigger when user asks about établissements sensibles, écoles, hôpitaux, crèches, EHPAD, pharmacies, lieux vulnérables, population à risque, proches d'un site.
-allowed-tools: Bash(python3 *)
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/main.py *)
 ---
 
 # Skill etablissements-sensibles
